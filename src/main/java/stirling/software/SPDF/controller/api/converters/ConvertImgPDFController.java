@@ -13,7 +13,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.rendering.ImageType;
@@ -75,7 +74,7 @@ public class ConvertImgPDFController {
         ;
         try {
             // Load the input PDF
-            byte[] newPdfBytes = rearrangePdfPages(file.getBytes(), pageOrderArr);
+            byte[] newPdfBytes = rearrangePdfPages(file, pageOrderArr);
 
             ImageType colorTypeResult = ImageType.RGB;
             if ("greyscale".equals(colorType)) {
@@ -91,6 +90,7 @@ public class ConvertImgPDFController {
 
             result =
                     PdfUtils.convertFromPdf(
+                            pdfDocumentFactory,
                             newPdfBytes,
                             "webp".equalsIgnoreCase(imageFormat)
                                     ? "png"
@@ -243,9 +243,10 @@ public class ConvertImgPDFController {
      * @return A byte array of the rearranged PDF.
      * @throws IOException If an error occurs while processing the PDF.
      */
-    private byte[] rearrangePdfPages(byte[] pdfBytes, String[] pageOrderArr) throws IOException {
+    private byte[] rearrangePdfPages(MultipartFile pdfFile, String[] pageOrderArr)
+            throws IOException {
         // Load the input PDF
-        PDDocument document = Loader.loadPDF(pdfBytes);
+        PDDocument document = pdfDocumentFactory.load(pdfFile);
         int totalPages = document.getNumberOfPages();
         List<Integer> newPageOrder = GeneralUtils.parsePageList(pageOrderArr, totalPages, false);
 
