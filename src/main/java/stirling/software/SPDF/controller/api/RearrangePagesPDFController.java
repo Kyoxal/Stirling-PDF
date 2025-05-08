@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,12 +18,13 @@ import io.github.pixee.security.Filenames;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import stirling.software.SPDF.model.SortTypes;
 import stirling.software.SPDF.model.api.PDFWithPageNums;
 import stirling.software.SPDF.model.api.general.RearrangePagesRequest;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 import stirling.software.SPDF.utils.GeneralUtils;
 import stirling.software.SPDF.utils.WebResponseUtils;
 
@@ -32,20 +32,18 @@ import stirling.software.SPDF.utils.WebResponseUtils;
 @RequestMapping("/api/v1/general")
 @Slf4j
 @Tag(name = "General", description = "General APIs")
+@RequiredArgsConstructor
 public class RearrangePagesPDFController {
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
-
-    @Autowired
-    public RearrangePagesPDFController(CustomPDDocumentFactory pdfDocumentFactory) {
-        this.pdfDocumentFactory = pdfDocumentFactory;
-    }
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
 
     @PostMapping(consumes = "multipart/form-data", value = "/remove-pages")
     @Operation(
             summary = "Remove pages from a PDF file",
             description =
-                    "This endpoint removes specified pages from a given PDF file. Users can provide a comma-separated list of page numbers or ranges to delete. Input:PDF Output:PDF Type:SISO")
+                    "This endpoint removes specified pages from a given PDF file. Users can provide"
+                            + " a comma-separated list of page numbers or ranges to delete. Input:PDF"
+                            + " Output:PDF Type:SISO")
     public ResponseEntity<byte[]> deletePages(@ModelAttribute PDFWithPageNums request)
             throws IOException {
 
@@ -242,7 +240,10 @@ public class RearrangePagesPDFController {
     @Operation(
             summary = "Rearrange pages in a PDF file",
             description =
-                    "This endpoint rearranges pages in a given PDF file based on the specified page order or custom mode. Users can provide a page order as a comma-separated list of page numbers or page ranges, or a custom mode. Input:PDF Output:PDF")
+                    "This endpoint rearranges pages in a given PDF file based on the specified page"
+                            + " order or custom mode. Users can provide a page order as a"
+                            + " comma-separated list of page numbers or page ranges, or a custom mode."
+                            + " Input:PDF Output:PDF")
     public ResponseEntity<byte[]> rearrangePages(@ModelAttribute RearrangePagesRequest request)
             throws IOException {
         MultipartFile pdfFile = request.getFileInput();

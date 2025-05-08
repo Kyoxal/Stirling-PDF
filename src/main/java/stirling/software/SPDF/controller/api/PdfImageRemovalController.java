@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,8 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import lombok.RequiredArgsConstructor;
+
 import stirling.software.SPDF.model.api.PDFFile;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 import stirling.software.SPDF.service.PdfImageRemovalService;
 import stirling.software.SPDF.utils.WebResponseUtils;
 
@@ -26,25 +27,13 @@ import stirling.software.SPDF.utils.WebResponseUtils;
 @RestController
 @RequestMapping("/api/v1/general")
 @Tag(name = "General", description = "General APIs")
+@RequiredArgsConstructor
 public class PdfImageRemovalController {
 
     // Service for removing images from PDFs
     private final PdfImageRemovalService pdfImageRemovalService;
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
-
-    /**
-     * Constructor for dependency injection of PdfImageRemovalService.
-     *
-     * @param pdfImageRemovalService The service used for removing images from PDFs.
-     */
-    @Autowired
-    public PdfImageRemovalController(
-            PdfImageRemovalService pdfImageRemovalService,
-            CustomPDDocumentFactory pdfDocumentFactory) {
-        this.pdfImageRemovalService = pdfImageRemovalService;
-        this.pdfDocumentFactory = pdfDocumentFactory;
-    }
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
 
     /**
      * Endpoint to remove images from a PDF file.
@@ -61,7 +50,8 @@ public class PdfImageRemovalController {
     @Operation(
             summary = "Remove images from file to reduce the file size.",
             description =
-                    "This endpoint remove images from file to reduce the file size.Input:PDF Output:PDF Type:MISO")
+                    "This endpoint remove images from file to reduce the file size.Input:PDF"
+                            + " Output:PDF Type:MISO")
     public ResponseEntity<byte[]> removeImages(@ModelAttribute PDFFile file) throws IOException {
         // Load the PDF document
         PDDocument document = pdfDocumentFactory.load(file);

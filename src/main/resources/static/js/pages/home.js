@@ -33,10 +33,11 @@ function setAnalytics(enabled) {
 }
 
 updateFavoriteIcons();
+const contentPath = /*[[${@contextPath}]]*/ '';
 
 const defaultView = localStorage.getItem('defaultView') || 'home'; // Default to "home"
 if (defaultView === 'home-legacy') {
-  window.location.href = '/home-legacy'; // Redirect to legacy view
+  window.location.href = contentPath + 'home-legacy'; // Redirect to legacy view
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -60,6 +61,10 @@ document.addEventListener('DOMContentLoaded', function () {
   localStorage.setItem('pageViews', pageViews.toString());
 
   function shouldShowSurvey() {
+    if(!window.showSurvey) {
+      return false;
+    }
+
     if (localStorage.getItem('dontShowSurvey') === 'true' || localStorage.getItem('surveyTaken') === 'true') {
       return false;
     }
@@ -111,10 +116,10 @@ function setAsDefault(value) {
 
 function adjustVisibleElements() {
   const container = document.querySelector('.recent-features');
+  if(!container) return;
   const subElements = Array.from(container.children);
 
   let totalWidth = 0;
-  const containerWidth = container.offsetWidth;
 
   subElements.forEach((element) => {
     totalWidth += 12 * parseFloat(getComputedStyle(document.documentElement).fontSize);

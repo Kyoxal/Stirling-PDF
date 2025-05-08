@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +17,10 @@ import io.github.pixee.security.Filenames;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import lombok.RequiredArgsConstructor;
+
 import stirling.software.SPDF.model.api.PDFFile;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 import stirling.software.SPDF.utils.ProcessExecutor;
 import stirling.software.SPDF.utils.ProcessExecutor.ProcessExecutorResult;
 import stirling.software.SPDF.utils.WebResponseUtils;
@@ -27,20 +28,18 @@ import stirling.software.SPDF.utils.WebResponseUtils;
 @RestController
 @RequestMapping("/api/v1/misc")
 @Tag(name = "Misc", description = "Miscellaneous APIs")
+@RequiredArgsConstructor
 public class RepairController {
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
-
-    @Autowired
-    public RepairController(CustomPDDocumentFactory pdfDocumentFactory) {
-        this.pdfDocumentFactory = pdfDocumentFactory;
-    }
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
 
     @PostMapping(consumes = "multipart/form-data", value = "/repair")
     @Operation(
             summary = "Repair a PDF file",
             description =
-                    "This endpoint repairs a given PDF file by running qpdf command. The PDF is first saved to a temporary location, repaired, read back, and then returned as a response. Input:PDF Output:PDF Type:SISO")
+                    "This endpoint repairs a given PDF file by running qpdf command. The PDF is"
+                            + " first saved to a temporary location, repaired, read back, and then"
+                            + " returned as a response. Input:PDF Output:PDF Type:SISO")
     public ResponseEntity<byte[]> repairPdf(@ModelAttribute PDFFile request)
             throws IOException, InterruptedException {
         MultipartFile inputFile = request.getFileInput();

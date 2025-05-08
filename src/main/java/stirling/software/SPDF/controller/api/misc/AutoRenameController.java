@@ -8,7 +8,6 @@ import java.util.List;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,33 +19,31 @@ import io.github.pixee.security.Filenames;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import stirling.software.SPDF.model.api.misc.ExtractHeaderRequest;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 import stirling.software.SPDF.utils.WebResponseUtils;
 
 @RestController
 @RequestMapping("/api/v1/misc")
 @Slf4j
 @Tag(name = "Misc", description = "Miscellaneous APIs")
+@RequiredArgsConstructor
 public class AutoRenameController {
 
-    private static final float TITLE_FONT_SIZE_THRESHOLD = 20.0f;
+    // private static final float TITLE_FONT_SIZE_THRESHOLD = 20.0f;
     private static final int LINE_LIMIT = 200;
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
-
-    @Autowired
-    public AutoRenameController(CustomPDDocumentFactory pdfDocumentFactory) {
-        this.pdfDocumentFactory = pdfDocumentFactory;
-    }
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
 
     @PostMapping(consumes = "multipart/form-data", value = "/auto-rename")
     @Operation(
             summary = "Extract header from PDF file",
             description =
-                    "This endpoint accepts a PDF file and attempts to extract its title or header based on heuristics. Input:PDF Output:PDF Type:SISO")
+                    "This endpoint accepts a PDF file and attempts to extract its title or header"
+                            + " based on heuristics. Input:PDF Output:PDF Type:SISO")
     public ResponseEntity<byte[]> extractHeader(@ModelAttribute ExtractHeaderRequest request)
             throws Exception {
         MultipartFile file = request.getFileInput();

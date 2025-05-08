@@ -13,7 +13,6 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.QuoteMode;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -26,11 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import stirling.software.SPDF.model.api.PDFWithPageNums;
 import stirling.software.SPDF.pdf.FlexibleCSVWriter;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 
 import technology.tabula.ObjectExtractor;
 import technology.tabula.Page;
@@ -41,20 +41,17 @@ import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 @RequestMapping("/api/v1/convert")
 @Tag(name = "Convert", description = "Convert APIs")
 @Slf4j
+@RequiredArgsConstructor
 public class ExtractCSVController {
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
-
-    @Autowired
-    public ExtractCSVController(CustomPDDocumentFactory pdfDocumentFactory) {
-        this.pdfDocumentFactory = pdfDocumentFactory;
-    }
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
 
     @PostMapping(value = "/pdf/csv", consumes = "multipart/form-data")
     @Operation(
             summary = "Extracts a CSV document from a PDF",
             description =
-                    "This operation takes an input PDF file and returns CSV file of whole page. Input:PDF Output:CSV Type:SISO")
+                    "This operation takes an input PDF file and returns CSV file of whole page."
+                            + " Input:PDF Output:CSV Type:SISO")
     public ResponseEntity<?> pdfToCsv(@ModelAttribute PDFWithPageNums form) throws Exception {
         String baseName = getBaseName(form.getFileInput().getOriginalFilename());
         List<CsvEntry> csvEntries = new ArrayList<>();

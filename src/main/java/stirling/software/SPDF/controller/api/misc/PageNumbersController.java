@@ -10,7 +10,6 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,28 +22,27 @@ import io.github.pixee.security.Filenames;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import lombok.RequiredArgsConstructor;
+
 import stirling.software.SPDF.model.api.misc.AddPageNumbersRequest;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 import stirling.software.SPDF.utils.GeneralUtils;
 import stirling.software.SPDF.utils.WebResponseUtils;
 
 @RestController
 @RequestMapping("/api/v1/misc")
 @Tag(name = "Misc", description = "Miscellaneous APIs")
+@RequiredArgsConstructor
 public class PageNumbersController {
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
-
-    @Autowired
-    public PageNumbersController(CustomPDDocumentFactory pdfDocumentFactory) {
-        this.pdfDocumentFactory = pdfDocumentFactory;
-    }
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
 
     @PostMapping(value = "/add-page-numbers", consumes = "multipart/form-data")
     @Operation(
             summary = "Add page numbers to a PDF document",
             description =
-                    "This operation takes an input PDF file and adds page numbers to it. Input:PDF Output:PDF Type:SISO")
+                    "This operation takes an input PDF file and adds page numbers to it. Input:PDF"
+                            + " Output:PDF Type:SISO")
     public ResponseEntity<byte[]> addPageNumbers(@ModelAttribute AddPageNumbersRequest request)
             throws IOException {
 

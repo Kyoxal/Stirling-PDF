@@ -14,7 +14,6 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -28,6 +27,7 @@ import io.github.pixee.security.Filenames;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import stirling.software.SPDF.model.PDFText;
@@ -35,7 +35,7 @@ import stirling.software.SPDF.model.api.security.ManualRedactPdfRequest;
 import stirling.software.SPDF.model.api.security.RedactPdfRequest;
 import stirling.software.SPDF.model.api.security.RedactionArea;
 import stirling.software.SPDF.pdf.TextFinder;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 import stirling.software.SPDF.utils.GeneralUtils;
 import stirling.software.SPDF.utils.PdfUtils;
 import stirling.software.SPDF.utils.WebResponseUtils;
@@ -45,14 +45,10 @@ import stirling.software.SPDF.utils.propertyeditor.StringToArrayListPropertyEdit
 @RequestMapping("/api/v1/security")
 @Slf4j
 @Tag(name = "Security", description = "Security APIs")
+@RequiredArgsConstructor
 public class RedactController {
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
-
-    @Autowired
-    public RedactController(CustomPDDocumentFactory pdfDocumentFactory) {
-        this.pdfDocumentFactory = pdfDocumentFactory;
-    }
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -64,7 +60,9 @@ public class RedactController {
     @Operation(
             summary = "Redacts areas and pages in a PDF document",
             description =
-                    "This operation takes an input PDF file with a list of areas, page number(s)/range(s)/function(s) to redact. Input:PDF, Output:PDF, Type:SISO")
+                    "This operation takes an input PDF file with a list of areas, page"
+                            + " number(s)/range(s)/function(s) to redact. Input:PDF, Output:PDF,"
+                            + " Type:SISO")
     public ResponseEntity<byte[]> redactPDF(@ModelAttribute ManualRedactPdfRequest request)
             throws IOException {
         MultipartFile file = request.getFileInput();
@@ -196,8 +194,8 @@ public class RedactController {
     @Operation(
             summary = "Redacts listOfText in a PDF document",
             description =
-                    "This operation takes an input PDF file and redacts the provided listOfText. Input:PDF,"
-                            + " Output:PDF, Type:SISO")
+                    "This operation takes an input PDF file and redacts the provided listOfText."
+                            + " Input:PDF, Output:PDF, Type:SISO")
     public ResponseEntity<byte[]> redactPdf(@ModelAttribute RedactPdfRequest request)
             throws Exception {
         MultipartFile file = request.getFileInput();

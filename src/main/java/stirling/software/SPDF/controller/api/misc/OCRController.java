@@ -5,7 +5,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -29,28 +28,23 @@ import io.github.pixee.security.Filenames;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import stirling.software.SPDF.model.ApplicationProperties;
 import stirling.software.SPDF.model.api.misc.ProcessPdfWithOcrRequest;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 
 @RestController
 @RequestMapping("/api/v1/misc")
 @Tag(name = "Misc", description = "Miscellaneous APIs")
 @Slf4j
+@RequiredArgsConstructor
 public class OCRController {
 
     private final ApplicationProperties applicationProperties;
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
-
-    public OCRController(
-            ApplicationProperties applicationProperties,
-            CustomPDDocumentFactory pdfDocumentFactory) {
-        this.applicationProperties = applicationProperties;
-        this.pdfDocumentFactory = pdfDocumentFactory;
-    }
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
 
     /** Gets the list of available Tesseract languages from the tessdata directory */
     public List<String> getAvailableTesseractLanguages() {
@@ -62,15 +56,17 @@ public class OCRController {
         return Arrays.stream(files)
                 .filter(file -> file.getName().endsWith(".traineddata"))
                 .map(file -> file.getName().replace(".traineddata", ""))
-                .filter(lang -> !lang.equalsIgnoreCase("osd"))
-                .collect(Collectors.toList());
+                .filter(lang -> !"osd".equalsIgnoreCase(lang))
+                .toList();
     }
 
     @PostMapping(consumes = "multipart/form-data", value = "/ocr-pdf")
     @Operation(
             summary = "Process PDF files with OCR using Tesseract",
             description =
-                    "Takes a PDF file as input, performs OCR using specified languages and OCR type (skip-text/force-ocr), and returns the processed PDF. Input:PDF Output:PDF Type:SISO")
+                    "Takes a PDF file as input, performs OCR using specified languages and OCR type"
+                            + " (skip-text/force-ocr), and returns the processed PDF. Input:PDF"
+                            + " Output:PDF Type:SISO")
     public ResponseEntity<byte[]> processPdfWithOCR(
             @ModelAttribute ProcessPdfWithOcrRequest request)
             throws IOException, InterruptedException {

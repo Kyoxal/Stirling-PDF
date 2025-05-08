@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,11 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import stirling.software.SPDF.config.RuntimePathConfig;
+import stirling.software.SPDF.model.ApplicationProperties;
 import stirling.software.SPDF.model.api.converters.UrlToPdfRequest;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 import stirling.software.SPDF.utils.GeneralUtils;
 import stirling.software.SPDF.utils.ProcessExecutor;
 import stirling.software.SPDF.utils.ProcessExecutor.ProcessExecutorResult;
@@ -31,27 +32,26 @@ import stirling.software.SPDF.utils.WebResponseUtils;
 @Tag(name = "Convert", description = "Convert APIs")
 @Slf4j
 @RequestMapping("/api/v1/convert")
+@RequiredArgsConstructor
 public class ConvertWebsiteToPDF {
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
     private final RuntimePathConfig runtimePathConfig;
-
-    @Autowired
-    public ConvertWebsiteToPDF(
-            CustomPDDocumentFactory pdfDocumentFactory, RuntimePathConfig runtimePathConfig) {
-        this.pdfDocumentFactory = pdfDocumentFactory;
-        this.runtimePathConfig = runtimePathConfig;
-    }
+    private final ApplicationProperties applicationProperties;
 
     @PostMapping(consumes = "multipart/form-data", value = "/url/pdf")
     @Operation(
             summary = "Convert a URL to a PDF",
             description =
-                    "This endpoint fetches content from a URL and converts it to a PDF format. Input:N/A Output:PDF Type:SISO")
+                    "This endpoint fetches content from a URL and converts it to a PDF format."
+                            + " Input:N/A Output:PDF Type:SISO")
     public ResponseEntity<byte[]> urlToPdf(@ModelAttribute UrlToPdfRequest request)
             throws IOException, InterruptedException {
         String URL = request.getUrlInput();
 
+        if (!applicationProperties.getSystem().getEnableUrlToPDF()) {
+            throw new IllegalArgumentException("This endpoint has been disabled by the admin.");
+        }
         // Validate the URL format
         if (!URL.matches("^https?://.*") || !GeneralUtils.isValidURL(URL)) {
             throw new IllegalArgumentException("Invalid URL format provided.");

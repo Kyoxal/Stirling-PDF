@@ -12,7 +12,6 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.apache.pdfbox.util.Matrix;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,27 +23,26 @@ import io.github.pixee.security.Filenames;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import lombok.RequiredArgsConstructor;
+
 import stirling.software.SPDF.model.api.general.ScalePagesRequest;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 import stirling.software.SPDF.utils.WebResponseUtils;
 
 @RestController
 @RequestMapping("/api/v1/general")
 @Tag(name = "General", description = "General APIs")
+@RequiredArgsConstructor
 public class ScalePagesController {
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
-
-    @Autowired
-    public ScalePagesController(CustomPDDocumentFactory pdfDocumentFactory) {
-        this.pdfDocumentFactory = pdfDocumentFactory;
-    }
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
 
     @PostMapping(value = "/scale-pages", consumes = "multipart/form-data")
     @Operation(
             summary = "Change the size of a PDF page/document",
             description =
-                    "This operation takes an input PDF file and the size to scale the pages to in the output PDF file. Input:PDF Output:PDF Type:SISO")
+                    "This operation takes an input PDF file and the size to scale the pages to in"
+                            + " the output PDF file. Input:PDF Output:PDF Type:SISO")
     public ResponseEntity<byte[]> scalePages(@ModelAttribute ScalePagesRequest request)
             throws IOException {
         MultipartFile file = request.getFileInput();
@@ -123,7 +121,8 @@ public class ScalePagesController {
         }
 
         throw new IllegalArgumentException(
-                "Invalid PDRectangle. It must be one of the following: A0, A1, A2, A3, A4, A5, A6, LETTER, LEGAL, KEEP");
+                "Invalid PDRectangle. It must be one of the following: A0, A1, A2, A3, A4, A5, A6,"
+                        + " LETTER, LEGAL, KEEP");
     }
 
     private Map<String, PDRectangle> getSizeMap() {

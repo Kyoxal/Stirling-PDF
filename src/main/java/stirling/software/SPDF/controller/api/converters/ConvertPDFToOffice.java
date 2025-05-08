@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -17,31 +16,30 @@ import io.github.pixee.security.Filenames;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import lombok.RequiredArgsConstructor;
+
 import stirling.software.SPDF.model.api.PDFFile;
 import stirling.software.SPDF.model.api.converters.PdfToPresentationRequest;
 import stirling.software.SPDF.model.api.converters.PdfToTextOrRTFRequest;
 import stirling.software.SPDF.model.api.converters.PdfToWordRequest;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 import stirling.software.SPDF.utils.PDFToFile;
 import stirling.software.SPDF.utils.WebResponseUtils;
 
 @RestController
 @RequestMapping("/api/v1/convert")
 @Tag(name = "Convert", description = "Convert APIs")
+@RequiredArgsConstructor
 public class ConvertPDFToOffice {
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
-
-    @Autowired
-    public ConvertPDFToOffice(CustomPDDocumentFactory pdfDocumentFactory) {
-        this.pdfDocumentFactory = pdfDocumentFactory;
-    }
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
 
     @PostMapping(consumes = "multipart/form-data", value = "/pdf/presentation")
     @Operation(
             summary = "Convert PDF to Presentation format",
             description =
-                    "This endpoint converts a given PDF file to a Presentation format. Input:PDF Output:PPT Type:SISO")
+                    "This endpoint converts a given PDF file to a Presentation format. Input:PDF"
+                            + " Output:PPT Type:SISO")
     public ResponseEntity<byte[]> processPdfToPresentation(
             @ModelAttribute PdfToPresentationRequest request)
             throws IOException, InterruptedException {
@@ -55,7 +53,8 @@ public class ConvertPDFToOffice {
     @Operation(
             summary = "Convert PDF to Text or RTF format",
             description =
-                    "This endpoint converts a given PDF file to Text or RTF format. Input:PDF Output:TXT Type:SISO")
+                    "This endpoint converts a given PDF file to Text or RTF format. Input:PDF"
+                            + " Output:TXT Type:SISO")
     public ResponseEntity<byte[]> processPdfToRTForTXT(
             @ModelAttribute PdfToTextOrRTFRequest request)
             throws IOException, InterruptedException {
@@ -82,7 +81,8 @@ public class ConvertPDFToOffice {
     @Operation(
             summary = "Convert PDF to Word document",
             description =
-                    "This endpoint converts a given PDF file to a Word document format. Input:PDF Output:WORD Type:SISO")
+                    "This endpoint converts a given PDF file to a Word document format. Input:PDF"
+                            + " Output:WORD Type:SISO")
     public ResponseEntity<byte[]> processPdfToWord(@ModelAttribute PdfToWordRequest request)
             throws IOException, InterruptedException {
         MultipartFile inputFile = request.getFileInput();
@@ -95,7 +95,8 @@ public class ConvertPDFToOffice {
     @Operation(
             summary = "Convert PDF to XML",
             description =
-                    "This endpoint converts a PDF file to an XML file. Input:PDF Output:XML Type:SISO")
+                    "This endpoint converts a PDF file to an XML file. Input:PDF Output:XML"
+                            + " Type:SISO")
     public ResponseEntity<byte[]> processPdfToXML(@ModelAttribute PDFFile request)
             throws Exception {
         MultipartFile inputFile = request.getFileInput();
